@@ -3,8 +3,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { signUpSchema, SignUpType } from "@/lib/types";
-import { signUp } from "@/apis/authAPI";
 import toast, { Toaster } from "react-hot-toast";
+import Link from "next/link";
+import { signUp } from "@/services/auth";
+import useLocalStorage from "@/hooks/useLocalStorage";
 
 export default function SignUp() {
   const {
@@ -25,16 +27,18 @@ export default function SignUp() {
 
   const handleSignup = async (formdata: SignUpType) => {
     const res = await signUp(formdata);
+    console.log(res.result.data);
     if (res?.error) {
-      const notify = () => toast.error(res.error.error);
+      const notify = () => toast.error(res.result.message);
       notify();
+    }else{
+      useLocalStorage(res.result.data, false);
     }
-    reset();
   };
 
   return (
     <>
-      <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-20 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-20 px-2 sm:px-6 lg:px-8">
         <Toaster />
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
@@ -42,12 +46,12 @@ export default function SignUp() {
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600 max-w">
             Or <br />
-            <a
-              href="#"
+            <Link
+              href="/signin"
               className="font-medium text-blue-600 hover:text-blue-500"
             >
               already have an account
-            </a>
+            </Link>
           </p>
         </div>
 
